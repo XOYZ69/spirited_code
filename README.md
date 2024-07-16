@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="icon.png" width="300px">
+</p>
+
 # Spirited Code
 Advent of code collection from different years in different languages. Who got the fastest solution?
 
