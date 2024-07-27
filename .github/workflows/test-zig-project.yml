@@ -1,4 +1,4 @@
-name: Test Project
+name: Test Zig Projects
 
 on:
   pull_request:
@@ -17,7 +17,7 @@ jobs:
         os: [ubuntu-latest]
         day: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25']
         year: [2023]  # Add years as needed
-        user: [xoyz69]
+        user: [xoyz69, FelixLeander]
         lang: [zig]
 
     runs-on: ${{matrix.os}}
