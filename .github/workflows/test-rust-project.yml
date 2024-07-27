@@ -10,7 +10,7 @@ on:
 
 jobs:
   test:
-  - name: "\n\r\n\r<h1>SUCK-IT</h1>\n\r\n\r"
+    name: "\n\r\n\r<h1>SUCK-IT</h1>\n\r\n\r"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
