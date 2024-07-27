@@ -39,6 +39,7 @@ jobs:
         run: zig build src/${{matrix.year}}/day-${{matrix.day}}/${{matrix.lang}}/${{matrix.user}}
 
   lint:
+    name: "Checking Zig lint"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
