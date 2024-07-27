@@ -27,7 +27,7 @@ jobs:
                 path="src/${year}/${day}/zig/${user}"
                 if [ -d "$path" ]; then
                   echo "Running tests for $path"
-                  zig build $path || exit 1
+                  (cd $path && zig build) || exit 1
                 else
                   echo "Directory $path does not exist, skipping."
                 fi
