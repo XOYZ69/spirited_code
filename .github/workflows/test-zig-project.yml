@@ -18,10 +18,13 @@ jobs:
           version: 0.13.0
       - name: Run Tests
         run: |
-          for year in /src/*/; do
-            for day in /src/year/*/; do
-              for user in /src/year/day/*/; do
-                path="src/${year}/day-${day}/zig/${user}"
+          for year in src/*/; do
+            year=$(basename "$year")
+            for day in src/${year}/*/; do
+              day=$(basename "$day")
+              for user in src/${year}/${day}/*/; do
+                user=$(basename "$user")
+                path="src/${year}/${day}/zig/${user}"
                 if [ -d "$path" ]; then
                   echo "Running tests for $path"
                   zig build $path || exit 1
