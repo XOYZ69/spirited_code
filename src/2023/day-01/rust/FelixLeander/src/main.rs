@@ -1,6 +1,6 @@
 use itertools::Itertools;
 
-const INPUT: &str = include_str!("input.text");
+const INPUT: &str = include_str!("input");
 fn main() {
     day_one_puzzle_one();
     day_one_puzzle_two();
