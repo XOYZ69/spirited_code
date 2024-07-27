@@ -1,0 +1,47 @@
+name: Test Zig Projects
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - /**zig**/
+
+jobs:
+  test:
+    name: ZIGGY
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: goto-bus-stop/setup-zig@v2
+        with:
+          version: 0.13.0
+      - name: Run Tests
+        run: |
+          for year in src/*/; do
+            year=$(basename "$year")
+            for day in src/${year}/*/; do
+              day=$(basename "$day")
+              for user in src/${year}/${day}/zig/*/; do
+                user=$(basename "$user")
+                path="src/${year}/${day}/zig/${user}"
+                if [ -d "$path" ]; then
+                  echo "Running tests for $path"
+                  (cd $path && zig build)
+                else
+                  echo "Directory $path does not exist, skipping."
+                fi
+              done
+            done
+          done
+
+  lint:
+    name: "Checking Zig lint"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: goto-bus-stop/setup-zig@v2
+        with:
+          version: 0.13.0
+      - run: zig fmt --check .
