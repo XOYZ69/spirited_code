@@ -1,0 +1,44 @@
+name: Test rust Projects
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - /**rust**/
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Rust 
+        uses: actions/setup-rust@v1
+      - name: Cache Cargo registry
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+      - name: Run Tests
+        run: |
+          for year in src/*/; do
+            year=$(basename "$year")
+            for day in src/${year}/*/; do
+              day=$(basename "$day")
+              for user in src/${year}/${day}/rust/*/; do
+                user=$(basename "$user")
+                path="src/${year}/${day}/rust/${user}"
+                if [ -d "$path" ]; then
+                  echo "Running tests for $path"
+                  (cd $path && cargo build --release)
+                else
+                  echo "Directory $path does not exist, skipping."
+                fi
+              done
+            done
+          done
