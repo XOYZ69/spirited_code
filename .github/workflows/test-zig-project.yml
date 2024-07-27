@@ -22,7 +22,7 @@ jobs:
             year=$(basename "$year")
             for day in src/${year}/*/; do
               day=$(basename "$day")
-              for user in src/${year}/${day}/*/; do
+              for user in src/${year}/${day}/zig/*/; do
                 user=$(basename "$user")
                 path="src/${year}/${day}/zig/${user}"
                 if [ -d "$path" ]; then
