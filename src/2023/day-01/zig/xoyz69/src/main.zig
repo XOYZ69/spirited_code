@@ -1,8 +1,10 @@
 const std = @import("std");
 const print = std.debug.print;
 
-pub fn main() !void {
+// False for first part
+const secondPart = true;
 
+pub fn main() !void {
     
     // prepare the memory allocator
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -36,25 +38,18 @@ pub fn main() !void {
 
         print("{d} -- {s}\n", .{ line_index, line.items});
 
-        for (line.items, 0..) | item, index | {
-
-            if(item < '0' or item > '9') {
-                // print(" => Skip non-integer: {u}\n", .{ item });
-                continue;
-            }
-
-            const cache = try std.fmt.parseInt(i8, &[1]u8{ item }, 10);
-
-            if(cache != 0) {
-                print("i: {d} => {d}\n", .{ index, cache });
-
+        var i: usize = 0;
+        while (i < line.items.len) : (i+=1) {
+            if (sliceToValue(line.items[i..])) |val| {
                 if(cur[0] == 0) {
-                    cur[0] = @intCast(cache);
+                    cur[0] = @intCast(val);
                 } else {
-                    cur[1] = @intCast(cache);
+                    cur[1] = @intCast(val);
                 }
             }
         }
+        
+        print(" ---> Found this in the line: {d} / {d}\n", .{ cur[0], cur[1] });
 
         if(cur[1] == 0) {
             cur[1] = cur[0];
@@ -76,4 +71,37 @@ pub fn main() !void {
 
     print("Total lines: {d}\n", .{ line_index });
     print("Total sum: {d}", .{sum});
+}
+
+// Thanks mate: https://github.com/yanis-fourel/aoc2023-zig/blob/master/day1/2.zig
+fn startsWith(str: []const u8, substr: []const u8) bool {
+    var i: u32 = 0;
+    while (i < substr.len) : (i += 1) {
+        if (i >= str.len or str[i] != substr[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+fn sliceToValue(str: []const u8) ?u8 {
+
+    if (str[0] >= '0' and str[0] <= '9') {
+        return str[0] - '0';
+    }
+
+    if (!secondPart) {
+        return null;
+    }
+
+    const digitstr = [9][]const u8{ "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
+
+    var i: u8 = 0;
+    while (i < 9) : (i += 1) {
+        if (startsWith(str, digitstr[i])) {
+            return i + 1;
+        }
+    }
+
+    return null;
 }
