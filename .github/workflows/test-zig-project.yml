@@ -10,12 +10,15 @@ on:
 
 jobs:
   test:
+    name: ${{matrix.year}}/day-${{matrix.day}}/${{matrix.lang}}/${{matrix.user}}
+
     strategy:
       matrix:
         os: [ubuntu-latest]
         day: [01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
         year: [2023]  # Add years as needed
         user: [xoyz69]
+        lang: [zig]
 
     runs-on: ${{matrix.os}}
     steps:
@@ -26,14 +29,14 @@ jobs:
       - name: Check if directory exists
         id: check_dir
         run: |
-          if [ -d "src/${{matrix.year}}/day-${{matrix.day}}/zig/${{matrix.user}}" ]; then
-            echo "::set-output name=dir_exists::true"
+          if [ -d "src/${{matrix.year}}/day-${{matrix.day}}/${{matrix.lang}}/${{matrix.user}}" ]; then
+            run: echo "{dir_exists}={true}" >> $GITHUB_STATE
           else
-            echo "::set-output name=dir_exists::false"
+            run: echo "{dir_exists}={false}" >> $GITHUB_STATE
           fi
       - name: Run tests
         if: steps.check_dir.outputs.dir_exists == 'true'
-        run: zig build src/${{matrix.year}}/day-${{matrix.day}}/zig/${{matrix.user}}
+        run: zig build src/${{matrix.year}}/day-${{matrix.day}}/${{matrix.lang}}/${{matrix.user}}
 
   lint:
     runs-on: ubuntu-latest
