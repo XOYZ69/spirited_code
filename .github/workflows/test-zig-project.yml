@@ -1,0 +1,45 @@
+name: Test Project
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - /**zig**/
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        day: [01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
+        year: [2023]  # Add years as needed
+        user: [xoyz69]
+
+    runs-on: ${{matrix.os}}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: goto-bus-stop/setup-zig@v2
+        with:
+          version: 0.13.0
+      - name: Check if directory exists
+        id: check_dir
+        run: |
+          if [ -d "src/${{matrix.year}}/day-${{matrix.day}}/zig/${{matrix.user}}" ]; then
+            echo "::set-output name=dir_exists::true"
+          else
+            echo "::set-output name=dir_exists::false"
+          fi
+      - name: Run tests
+        if: steps.check_dir.outputs.dir_exists == 'true'
+        run: zig build src/${{matrix.year}}/day-${{matrix.day}}/zig/${{matrix.user}}
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: goto-bus-stop/setup-zig@v2
+        with:
+          version: 0.13.0
+      - run: zig fmt --check .
