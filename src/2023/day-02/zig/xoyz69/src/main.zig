@@ -33,17 +33,14 @@ const Game = struct {
         return true;
     }
 
-    pub fn load_values(self: Game, game_line: []u8) bool {
+    pub fn part_one(self: Game, game_line: []u8) bool {
         const game_content: []const u8 = get_entry(1, game_line, ": ");
-
-        std.debug.print("{d}: {s}\n", .{ self.id, game_content });
 
         var game_sets = std.mem.split(u8, game_content, "; ");
 
         var return_result: bool = true;
 
         while (game_sets.next()) |current| {
-            std.debug.print(" => {s}\n", .{current});
 
             var game_colors = std.mem.split(u8, current, ", ");
 
@@ -57,7 +54,6 @@ const Game = struct {
                     return false;
                 });
                 const color = get_entry(1, current_color, " ");
-                std.debug.print("# Got {d} of {s}\n", .{ amount, color });
 
                 if (std.mem.eql(u8, color, "red")) {
                     r = amount;
@@ -76,6 +72,11 @@ const Game = struct {
         }
 
         return return_result;
+    }
+
+    pub fn part_two(self: Game, game_line: []u8) bool {
+        std.debug.print("Part 2: {d} -> {d}\n", .{self.id, game_line.len});
+        return false;
     }
 };
 
@@ -96,10 +97,6 @@ fn get_entry(index: u8, source: []const u8, split: []const u8) []const u8 {
 }
 
 pub fn main() !void {
-    part_one();
-}
-
-pub fn part_one() !void {
     // prepare the memory allocation
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
@@ -120,16 +117,20 @@ pub fn part_one() !void {
 
     var line_index: u8 = 0;
 
-    var sum: usize = 0;
+    var sum_part_one: usize = 0;
+    var sum_part_two: usize = 0;
+
+    var newGame = Game.init(line_index, 12, 13, 14);
 
     while (reader.streamUntilDelimiter(writer, '\n', null)) {
         defer line.clearRetainingCapacity();
         line_index += 1;
 
-        std.debug.print("Game nr {d} => ", .{line_index});
-        var newGame = Game.init(line_index, 12, 13, 14);
-        if (newGame.load_values(line.items)) {
-            sum += line_index;
+        if (newGame.part_one(line.items)) {
+            sum_part_one += line_index;
+        }
+        if (newGame.part_two(line.items)) {
+            sum_part_two += line_index;
         }
 
         // var cache_line = std.mem.split(u8, line.items, ":");
@@ -139,5 +140,6 @@ pub fn part_one() !void {
         else => return err,
     }
 
-    std.debug.print("Result is {d}", .{sum});
+    std.debug.print("Result for part one is {d}\n", .{sum_part_one});
+    std.debug.print("Result for part two is {d}\n", .{sum_part_two});
 }
