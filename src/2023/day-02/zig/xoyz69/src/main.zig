@@ -41,7 +41,6 @@ const Game = struct {
         var return_result: bool = true;
 
         while (game_sets.next()) |current| {
-
             var game_colors = std.mem.split(u8, current, ", ");
 
             var r: u8 = 0;
@@ -74,9 +73,42 @@ const Game = struct {
         return return_result;
     }
 
-    pub fn part_two(self: Game, game_line: []u8) bool {
-        std.debug.print("Part 2: {d} -> {d}\n", .{self.id, game_line.len});
-        return false;
+    pub fn part_two(self: Game, game_line: []u8) i64 {
+        _ = self.id;
+
+        const game_content: []const u8 = get_entry(1, game_line, ": ");
+
+        var game_sets = std.mem.split(u8, game_content, "; ");
+
+        var return_result: i64 = 0;
+        var r: u8 = 0;
+        var g: u8 = 0;
+        var b: u8 = 0;
+
+        while (game_sets.next()) |current| {
+            var game_colors = std.mem.split(u8, current, ", ");
+
+            while (game_colors.next()) |current_color| {
+                const amount: u8 = @intCast(std.fmt.parseInt(u8, get_entry(0, current_color, " "), 10) catch {
+                    std.debug.print("Failed to parse integer.\n", .{});
+                    return 0;
+                });
+                const color = get_entry(1, current_color, " ");
+
+                if (std.mem.eql(u8, color, "red") and amount > r) {
+                    r = amount;
+                }
+                if (std.mem.eql(u8, color, "green") and amount > g) {
+                    g = amount;
+                }
+                if (std.mem.eql(u8, color, "blue") and amount > b) {
+                    b = amount;
+                }
+            }
+            return_result = @as(i64, r) * @as(i64, g) * @as(i64, b);
+        }
+
+        return return_result;
     }
 };
 
@@ -118,20 +150,17 @@ pub fn main() !void {
     var line_index: u8 = 0;
 
     var sum_part_one: usize = 0;
-    var sum_part_two: usize = 0;
-
-    var newGame = Game.init(line_index, 12, 13, 14);
+    var sum_part_two: i64 = 0;
 
     while (reader.streamUntilDelimiter(writer, '\n', null)) {
         defer line.clearRetainingCapacity();
         line_index += 1;
 
+        var newGame = Game.init(line_index, 12, 13, 14);
         if (newGame.part_one(line.items)) {
             sum_part_one += line_index;
         }
-        if (newGame.part_two(line.items)) {
-            sum_part_two += line_index;
-        }
+        sum_part_two += newGame.part_two(line.items);
 
         // var cache_line = std.mem.split(u8, line.items, ":");
 
