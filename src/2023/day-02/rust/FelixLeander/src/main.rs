@@ -1,6 +1,6 @@
 use std::str::Lines;
 
-const INPUT: &str = include_str!("input");
+const INPUT: &str = include_str!("../../../input");
 
 struct GameData {
     game_id: u32,
@@ -36,9 +36,12 @@ fn main() {
         println!("COULD NOT PARSE INPUT TO GAME DATA");
         return;
     }
+    let games = game_data.unwrap();
+        let result = sum_of_valid_games(&games, 12, 13, 14);
+        println!("P1 Result: {}", result);
 
-    let result = sum_of_valid_games(game_data.unwrap(), 12, 13, 14);
-    println!("RESULT: {}", result);
+        let result = sum_of_valid_games_puzzle_part_two(&games);
+        println!("P2 Result: {}", result);
 }
 
 fn parse_to_game_data(lines: Lines) -> Option<Vec<GameData>> {
@@ -122,8 +125,8 @@ fn part_text_to_game_part(text: &str) -> Option<GamePart> {
     });
 }
 
-fn sum_of_valid_games(game_data: Vec<GameData>, red: u32, green: u32, blue: u32) -> u32 {
-    let mut valid_game_data: Vec<GameData> = Vec::new();
+fn sum_of_valid_games(game_data: &Vec<GameData>, red: u32, green: u32, blue: u32) -> u32 {
+    let mut valid_game_data: Vec<&GameData> = Vec::new();
 
     for game in game_data {
         if game
@@ -137,4 +140,12 @@ fn sum_of_valid_games(game_data: Vec<GameData>, red: u32, green: u32, blue: u32)
 
     let result: u32 = valid_game_data.iter().map(|x| x.game_id).sum();
     return result;
+}
+
+fn sum_of_valid_games_puzzle_part_two(game_data: &Vec<GameData>) -> u32 {
+    game_data.iter().map(|x| GamePart {
+        red: x.parts.iter().map(|m| m.red).max().unwrap(),
+        green: x.parts.iter().map(|m| m.green).max().unwrap(),
+        blue: x.parts.iter().map(|m| m.blue).max().unwrap(),
+    }).map(|m| m.red * m.green * m.blue).sum()
 }
