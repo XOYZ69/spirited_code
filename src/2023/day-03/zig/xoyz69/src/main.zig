@@ -47,7 +47,7 @@ pub fn main() !void {
 
     var line_index: u8 = 0;
 
-    var cache_parent_array = std.ArrayList(std.ArrayList(usize)).init(allocator);
+    var line_symbol_index = std.ArrayList(std.ArrayList(usize)).init(allocator);
 
     while (reader.streamUntilDelimiter(writer, '\n', null)) {
         var object_position = std.ArrayList(usize).init(allocator);
@@ -62,7 +62,7 @@ pub fn main() !void {
             std.debug.print("[{d}: {c}]", .{ i, item });
         }
 
-        try cache_parent_array.append(object_position);
+        try line_symbol_index.append(object_position);
         std.debug.print("\n", .{});
 
         line_index += 1;
@@ -74,17 +74,17 @@ pub fn main() !void {
     while (line_index > 0) {
         line_index -= 1;
 
-        const current_list_opt = cache_parent_array.items[line_index];
+        const current_line_symbols = line_symbol_index.items[line_index];
 
         std.debug.print("{d}: ", .{line_index});
 
-        for (current_list_opt.items) |item| {
+        for (current_line_symbols.items) |item| {
             std.debug.print("{d} ", .{item});
         }
 
-        current_list_opt.deinit();
+        current_line_symbols.deinit();
         std.debug.print("\n", .{});
     }
 
-    cache_parent_array.deinit();
+    line_symbol_index.deinit();
 }
