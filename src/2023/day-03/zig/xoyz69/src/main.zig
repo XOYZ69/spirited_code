@@ -39,10 +39,6 @@ fn symbol_is_edging(pos_num: usize, value: usize, line_to_check: []std.ArrayList
     var found_symbol = false;
     const value_length = get_int_length(value);
 
-    if (pos_num <= 0) {
-        return false;
-    }
-
     if (line_index > 0) {
         if (line_index > line_to_check.len - 1) {
             return false;
@@ -50,10 +46,8 @@ fn symbol_is_edging(pos_num: usize, value: usize, line_to_check: []std.ArrayList
     }
 
     for (line_to_check[line_index].items) |symbol| {
-        if (symbol >= pos_num - 1) {
-            if (symbol <= pos_num + value_length + 1) {
-                found_symbol = true;
-            }
+        if (symbol + 1 >= pos_num and symbol <= pos_num + value_length + 1) {
+            found_symbol = true;
         }
     }
 
@@ -61,6 +55,13 @@ fn symbol_is_edging(pos_num: usize, value: usize, line_to_check: []std.ArrayList
 }
 
 pub fn main() !void {
+
+    // ANSI color codes
+    const RED = "\x1b[31m";
+    const GREEN = "\x1b[32m";
+    const BLUE = "\x1b[34m";
+    const RESET = "\x1b[0m";
+
     // prepare the memory allocation
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
@@ -89,15 +90,23 @@ pub fn main() !void {
         var number_position = std.AutoHashMap(usize, i32).init(allocator);
         defer line.clearRetainingCapacity();
 
-        std.debug.print("{d} -> ", .{line_index});
+        std.debug.print("{s}{d} -> {s}", .{ RESET, line_index, BLUE });
         var num_len: usize = 0;
         var last_character_numeric = false;
         var curent_character_numeric = false;
-        for (line.items[0 .. line.items.len - 2], 0..) |item, i| {
+        for (line.items[0..line.items.len], 0..) |item, i| {
             curent_character_numeric = is_numeric(item);
 
             if (curent_character_numeric) {
                 num_len += 1;
+                if (i >= line.items.len - 1) {
+                    const cache_string: []u8 = line.items[i - num_len + 1 .. i + 1];
+                    std.debug.print("({d}: {s})", .{ i - num_len, cache_string });
+                    std.debug.print("{s} | Last: {d}:{d} / {d} {s}", .{ RED, i - num_len + 1, i + 1, line.items.len, RESET });
+                    const cache = try std.fmt.parseInt(i32, cache_string, 10);
+                    try number_position.put(i - num_len, cache);
+                    num_len = 0;
+                }
             } else if (last_character_numeric) {
                 const cache_string: []u8 = line.items[i - num_len .. i];
                 std.debug.print("({d}: {s}) ", .{ i - num_len, cache_string });
@@ -130,57 +139,41 @@ pub fn main() !void {
     while (line_index > 0) {
         line_index -= 1;
 
-        const current_line_symbols = line_symbol_index.items[line_index];
         var current_line_numbers = line_number_map.items[line_index];
 
-        std.debug.print("{d}: ", .{line_index});
-
-        for (current_line_symbols.items) |item| {
-            std.debug.print("{d} ", .{item});
-        }
-
-        std.debug.print("\n -> ", .{});
+        std.debug.print("Line {d}: ", .{line_index});
 
         var number_iterator = current_line_numbers.keyIterator();
         while (number_iterator.next()) |entry| {
             const key = entry.*;
             const value = current_line_numbers.get(key) orelse -1;
-            std.debug.print("([", .{});
             var is_edged = false;
 
             if (line_index > 0) {
                 if (symbol_is_edging(key, @intCast(value), line_symbol_index.items, line_index - 1)) {
-                    std.debug.print("x", .{});
                     is_edged = true;
-                } else {
-                    std.debug.print("-", .{});
                 }
             }
 
             if (symbol_is_edging(key, @intCast(value), line_symbol_index.items, line_index)) {
-                std.debug.print("x", .{});
                 is_edged = true;
-            } else {
-                std.debug.print("-", .{});
             }
 
             if (line_index < line_symbol_index.items.len - 1) {
                 if (symbol_is_edging(key, @intCast(value), line_symbol_index.items, line_index + 1)) {
-                    std.debug.print("x", .{});
                     is_edged = true;
-                } else {
-                    std.debug.print("-", .{});
                 }
             }
 
             if (is_edged) {
                 total_sum += value;
+                std.debug.print("{s} ({d}: {d})", .{ GREEN, key, value });
+            } else {
+                std.debug.print("{s} ({d}: {d})", .{ RED, key, value });
             }
-
-            std.debug.print("] | {d}: {d}) ", .{ key, value });
         }
 
-        std.debug.print("\n", .{});
+        std.debug.print("{s}\n", .{RESET});
         current_line_numbers.deinit();
     }
 
