@@ -57,10 +57,10 @@ fn symbol_is_edging(pos_num: usize, value: usize, line_to_check: []std.ArrayList
 pub fn main() !void {
 
     // ANSI color codes
-    const RED = "\x1b[31m";
-    const GREEN = "\x1b[32m";
-    const BLUE = "\x1b[34m";
-    const RESET = "\x1b[0m";
+    // const RED = "\x1b[31m";
+    // const GREEN = "\x1b[32m";
+    // const BLUE = "\x1b[34m";
+    // const RESET = "\x1b[0m";
 
     // prepare the memory allocation
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -90,7 +90,7 @@ pub fn main() !void {
         var number_position = std.AutoHashMap(usize, i32).init(allocator);
         defer line.clearRetainingCapacity();
 
-        std.debug.print("{s}{d} -> {s}", .{ RESET, line_index, BLUE });
+        // std.debug.print("{s}{d} -> {s}", .{ RESET, line_index, BLUE });
         var num_len: usize = 0;
         var last_character_numeric = false;
         var curent_character_numeric = false;
@@ -101,15 +101,15 @@ pub fn main() !void {
                 num_len += 1;
                 if (i >= line.items.len - 1) {
                     const cache_string: []u8 = line.items[i - num_len + 1 .. i + 1];
-                    std.debug.print("({d}: {s})", .{ i - num_len, cache_string });
-                    std.debug.print("{s} | Last: {d}:{d} / {d} {s}", .{ RED, i - num_len + 1, i + 1, line.items.len, RESET });
+                    // std.debug.print("({d}: {s})", .{ i - num_len, cache_string });
+                    // std.debug.print("{s} | Last: {d}:{d} / {d} {s}", .{ RED, i - num_len + 1, i + 1, line.items.len, RESET });
                     const cache = try std.fmt.parseInt(i32, cache_string, 10);
                     try number_position.put(i - num_len, cache);
                     num_len = 0;
                 }
             } else if (last_character_numeric) {
                 const cache_string: []u8 = line.items[i - num_len .. i];
-                std.debug.print("({d}: {s}) ", .{ i - num_len, cache_string });
+                // std.debug.print("({d}: {s}) ", .{ i - num_len, cache_string });
                 const cache = try std.fmt.parseInt(i32, cache_string, 10);
                 try number_position.put(i - num_len, cache);
                 num_len = 0;
@@ -121,12 +121,12 @@ pub fn main() !void {
                 continue;
             }
             try object_position.append(i);
-            std.debug.print("[{d}: {c}]", .{ i, item });
+            // std.debug.print("[{d}: {c}]", .{ i, item });
         }
 
         try line_symbol_index.append(object_position);
         try line_number_map.append(number_position);
-        std.debug.print("\n", .{});
+        // std.debug.print("\n", .{});
 
         line_index += 1;
     } else |err| switch (err) {
@@ -141,7 +141,7 @@ pub fn main() !void {
 
         var current_line_numbers = line_number_map.items[line_index];
 
-        std.debug.print("Line {d}: ", .{line_index});
+        // std.debug.print("Line {d}: ", .{line_index});
 
         var number_iterator = current_line_numbers.keyIterator();
         while (number_iterator.next()) |entry| {
@@ -167,13 +167,13 @@ pub fn main() !void {
 
             if (is_edged) {
                 total_sum += value;
-                std.debug.print("{s} ({d}: {d})", .{ GREEN, key, value });
+                // std.debug.print("{s} ({d}: {d})", .{ GREEN, key, value });
             } else {
-                std.debug.print("{s} ({d}: {d})", .{ RED, key, value });
+                // std.debug.print("{s} ({d}: {d})", .{ RED, key, value });
             }
         }
 
-        std.debug.print("{s}\n", .{RESET});
+        // std.debug.print("{s}\n", .{RESET});
         current_line_numbers.deinit();
     }
 
@@ -184,5 +184,5 @@ pub fn main() !void {
     line_symbol_index.deinit();
     line_number_map.deinit();
 
-    std.debug.print("Result: {d}", .{total_sum});
+    std.debug.print("Result part 1: {d}", .{total_sum});
 }
