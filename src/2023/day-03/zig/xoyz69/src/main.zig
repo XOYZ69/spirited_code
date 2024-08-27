@@ -90,6 +90,8 @@ pub fn main() !void {
         var number_position = std.AutoHashMap(usize, i32).init(allocator);
         defer line.clearRetainingCapacity();
 
+        std.debug.print("Line {d}: ", .{line_index});
+
         // std.debug.print("{s}{d} -> {s}", .{ RESET, line_index, BLUE });
         var num_len: usize = 0;
         var last_character_numeric = false;
@@ -121,12 +123,12 @@ pub fn main() !void {
                 continue;
             }
             try object_position.append(i);
-            // std.debug.print("[{d}: {c}]", .{ i, item });
+            std.debug.print("[{d}: {c}]", .{ i, item });
         }
 
         try line_symbol_index.append(object_position);
         try line_number_map.append(number_position);
-        // std.debug.print("\n", .{});
+        std.debug.print("\n", .{});
 
         line_index += 1;
     } else |err| switch (err) {
@@ -148,6 +150,8 @@ pub fn main() !void {
             const key = entry.*;
             const value = current_line_numbers.get(key) orelse -1;
             var is_edged = false;
+
+            // std.debug.print("{any} ", .{value});
 
             if (line_index > 0) {
                 if (symbol_is_edging(key, @intCast(value), line_symbol_index.items, line_index - 1)) {
@@ -173,7 +177,7 @@ pub fn main() !void {
             }
         }
 
-        // std.debug.print("{s}\n", .{RESET});
+        // std.debug.print("\n", .{});
         current_line_numbers.deinit();
     }
 
