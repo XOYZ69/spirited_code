@@ -28,10 +28,43 @@ def part_1(order, numbers):
 
     print('Part 1:', total)
 
+def part_2(order, numbers):
+    correct_sequence = []
+    for sequence in numbers:
+        correctly_ordered = True
+        orderer = False
+        while not orderer:
+            orderer = True
+            for rule in order:
+                # check if rule is in the sequence
+                index_a, index_b = -1, -1
+                for i in range(len(sequence)):
+                    if sequence[i] == rule[0]:
+                        index_a = i
+                    if sequence[i] == rule[1]:
+                        index_b = i
+
+                # Skip if rule does not need to be applied
+                if index_a == -1 or index_b == -1:
+                    continue
+
+                # Check if rule is valid for this sequence
+                if index_a > index_b:
+                    correctly_ordered = False
+                    orderer = False
+                    sequence[index_a], sequence[index_b] = sequence[index_b], sequence[index_a]
 
 
-def part_2():
-    pass
+        if not correctly_ordered:
+            cache = sequence
+
+            correct_sequence.append(cache)
+
+    total = 0
+    for seq in correct_sequence:
+        total += seq[int(len(seq) / 2)]
+
+    print('Part 2:', total)
 
 def main():
     with open('../../.input', 'r', encoding = 'utf-8') as reader:
@@ -60,6 +93,7 @@ def main():
 
     # run the parts
     part_1(page_ordering, page_numbers)
+    part_2(page_ordering, page_numbers)
 
 if __name__ == '__main__':
     main()
