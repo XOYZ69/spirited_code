@@ -46,23 +46,21 @@ def part01():
             if nearest == (-1, -1) or cache < nearest[1]:
                 nearest = (vec_compare, cache)
 
-            group = -1
-            for i in range(len(pairs)):
-                if vectors[vec_compare] in pairs[i]:
-                    group = i
-
-            if group == -1:
-                pairs.append([vectors[vec_compare]])
+        group = -1
+        for i in range(len(pairs)):
+            if vectors[vec] in pairs[i]:
+                group = i
                 break
-            else:
-                pairs[group].append(vectors[vec_compare])
+
+        if group == -1:
+            pairs.append([vectors[nearest[0]]])
+        else:
+            if vectors[nearest[0]] not in pairs[group]:
+                pairs[group].append(vectors[nearest[0]])
 
         for pair in sorted(pairs, key=lambda x: len(x), reverse=True):
             print(len(pair), [str(x) for x in pair])
-
         print("#########################")
-        print(pairs)
-        input()
 
 
 if __name__ == "__main__":
